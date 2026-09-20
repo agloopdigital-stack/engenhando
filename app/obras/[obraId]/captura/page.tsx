@@ -48,9 +48,14 @@ export default function CapturaObraPage({
           <h1 className="font-display text-lg leading-tight">Registro de hoje</h1>
           <p className="text-sm capitalize text-concreto-300">{hoje}</p>
         </div>
-        <Link href={`/obras/${obraId}/dashboard`} className="text-sm text-concreto-300 underline">
-          Painel
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href={`/obras/${obraId}/dashboard`} className="text-sm text-concreto-300 underline">
+            Painel
+          </Link>
+          <Link href="/leads" className="text-sm text-concreto-300 underline">
+            Leads
+          </Link>
+        </div>
       </header>
 
       {erro && (

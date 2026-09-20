@@ -29,7 +29,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const rotaProtegida = request.nextUrl.pathname.startsWith("/obras");
+  const rotaProtegida =
+    request.nextUrl.pathname.startsWith("/obras") || request.nextUrl.pathname.startsWith("/leads");
 
   if (rotaProtegida && !user) {
     const url = request.nextUrl.clone();
@@ -42,5 +43,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/obras/:path*"],
+  matcher: ["/obras/:path*", "/leads/:path*"],
 };

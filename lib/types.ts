@@ -27,3 +27,40 @@ export interface RegistroDia {
   data: string;
   fechado: boolean;
 }
+
+export type EstagioLead = "novo" | "proposta_enviada" | "follow_up" | "fechado" | "perdido";
+
+export interface TipoServico {
+  id: string;
+  nome: string;
+}
+
+export interface Lead {
+  id: string;
+  conta_id: string;
+  nome: string;
+  contato: string | null;
+  tipo_servico_id: string | null;
+  estagio: EstagioLead;
+  obra_relacionada: string | null;
+  criado_em: string;
+}
+
+export interface TemplateProposta {
+  id: string;
+  conta_id: string;
+  nome: string;
+  corpo_template: string;
+  tipo_servico_id: string | null;
+}
+
+export interface Proposta {
+  id: string;
+  lead_id: string;
+  template_id: string | null;
+  valores_preenchidos: Record<string, string>;
+  pdf_url: string | null;
+  status: "rascunho" | "enviada" | "aceita" | "recusada";
+  enviada_em: string | null;
+  criado_em: string;
+}
