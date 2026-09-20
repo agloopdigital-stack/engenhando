@@ -131,5 +131,5 @@ export function useCapturaObra(obraId: string) {
     }
   }
 
-  return { midias, carregando, enviando, erro, enviarArquivo, enviarTexto };
+  return { midias, registroDiaId, carregando, enviando, erro, enviarArquivo, enviarTexto };
 }
