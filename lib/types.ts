@@ -99,3 +99,29 @@ export interface Gasto {
   nota_fiscal_url: string | null;
   criado_em: string;
 }
+
+export type FuncaoTrabalhador = "pedreiro" | "servente" | "eletricista" | "encanador" | "outro";
+
+export interface Trabalhador {
+  id: string;
+  obra_id: string;
+  nome: string;
+  funcao: FuncaoTrabalhador;
+  valor_diaria: number;
+  ativo: boolean;
+}
+
+export interface Checkin {
+  id: string;
+  trabalhador_id: string;
+  obra_id: string;
+  data: string;
+  presente: boolean;
+}
+
+export interface Vale {
+  id: string;
+  trabalhador_id: string;
+  valor: number;
+  data: string;
+}

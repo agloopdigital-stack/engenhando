@@ -58,6 +58,9 @@ export default function CapturaObraPage({
           <Link href={`/obras/${obraId}/financeiro`} className="text-sm text-concreto-300 underline">
             Financeiro
           </Link>
+          <Link href={`/obras/${obraId}/mao-de-obra`} className="text-sm text-concreto-300 underline">
+            Mão de obra
+          </Link>
           <Link href="/leads" className="text-sm text-concreto-300 underline">
             Leads
           </Link>
