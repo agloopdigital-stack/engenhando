@@ -1,5 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/followup", "schedule": "0 12 * * *" }
+    { "path": "/api/cron/followup", "schedule": "0 12 * * *" },
+    { "path": "/api/cron/alertas-documentos", "schedule": "0 12 * * *" }
   ]
 }

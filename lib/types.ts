@@ -64,3 +64,20 @@ export interface Proposta {
   enviada_em: string | null;
   criado_em: string;
 }
+
+export type TipoDocumentoObra =
+  | "alvara_construcao"
+  | "licenca_ambiental"
+  | "art"
+  | "laudo_bombeiro"
+  | "outro";
+
+export interface DocumentoObra {
+  id: string;
+  obra_id: string;
+  tipo: TipoDocumentoObra;
+  identificacao: string | null;
+  data_emissao: string | null;
+  data_vencimento: string;
+  criado_em: string;
+}
