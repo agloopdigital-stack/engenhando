@@ -81,3 +81,21 @@ export interface DocumentoObra {
   data_vencimento: string;
   criado_em: string;
 }
+
+export interface Orcamento {
+  id: string;
+  obra_id: string;
+  categoria: string;
+  valor_orcado: number;
+}
+
+export interface Gasto {
+  id: string;
+  obra_id: string;
+  categoria: string;
+  valor: number;
+  data: string;
+  fornecedor: string | null;
+  nota_fiscal_url: string | null;
+  criado_em: string;
+}
