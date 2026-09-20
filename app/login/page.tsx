@@ -34,7 +34,7 @@ function FormularioLogin() {
       return;
     }
 
-    router.push(searchParams.get("redirect") ?? "/obras/demo/captura");
+    router.push(searchParams.get("redirect") ?? "/obras/df0321c6-2379-455a-beb1-357a8750c5f2/captura");
     router.refresh();
   }
 
