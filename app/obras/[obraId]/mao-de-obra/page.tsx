@@ -155,7 +155,7 @@ export default function MaoDeObraPage({ params }: { params: Promise<{ obraId: st
       )}
 
       {formAberto && (
-        <div className="fixed inset-0 z-30 flex items-end bg-black/40" role="dialog">
+        <div className="fixed inset-0 z-40 flex items-end bg-black/40" role="dialog">
           <form
             onSubmit={salvarTrabalhador}
             className="flex w-full flex-col gap-3 rounded-t-2xl bg-white p-5"
@@ -207,7 +207,7 @@ export default function MaoDeObraPage({ params }: { params: Promise<{ obraId: st
       )}
 
       {formValeAberto && (
-        <div className="fixed inset-0 z-30 flex items-end bg-black/40" role="dialog">
+        <div className="fixed inset-0 z-40 flex items-end bg-black/40" role="dialog">
           <form onSubmit={salvarVale} className="flex w-full flex-col gap-3 rounded-t-2xl bg-white p-5">
             <h2 className="font-display text-lg">Registrar vale</h2>
             <input

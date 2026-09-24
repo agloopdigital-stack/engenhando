@@ -160,7 +160,7 @@ export function CascaApp({ children }: { children: React.ReactNode }) {
       <div className="min-h-0 flex-1 overflow-y-auto md:min-h-dvh md:overflow-visible">{children}</div>
 
       <nav
-        className="relative z-30 shrink-0 border-t border-white/10 bg-projeto-900 pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="relative z-20 shrink-0 border-t border-white/10 bg-projeto-900 pb-[env(safe-area-inset-bottom)] md:hidden"
         aria-label="Atalhos"
       >
         <ul className="flex h-[4.25rem]">

@@ -117,7 +117,7 @@ export default function DocumentosObraPage({
       )}
 
       {formAberto && (
-        <div className="fixed inset-0 z-30 flex items-end bg-black/40" role="dialog">
+        <div className="fixed inset-0 z-40 flex items-end bg-black/40" role="dialog">
           <form
             onSubmit={salvarDocumento}
             className="flex w-full flex-col gap-3 rounded-t-2xl bg-white p-5"
