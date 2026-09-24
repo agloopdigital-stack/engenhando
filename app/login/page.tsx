@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -13,7 +13,6 @@ export default function LoginPage() {
 }
 
 function FormularioLogin() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -34,8 +33,12 @@ function FormularioLogin() {
       return;
     }
 
-    router.push(searchParams.get("redirect") ?? "/obras/df0321c6-2379-455a-beb1-357a8750c5f2/captura");
-    router.refresh();
+    // Navegação completa: o cookie da sessão precisa ir no próximo documento.
+    // router.push + refresh mantinha a tela de login em "Entrando...".
+    const destino =
+      searchParams.get("redirect") ??
+      "/obras/df0321c6-2379-455a-beb1-357a8750c5f2/captura";
+    window.location.assign(destino);
   }
 
   return (
