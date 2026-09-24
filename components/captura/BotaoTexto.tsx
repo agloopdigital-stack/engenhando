@@ -13,7 +13,10 @@ export function BotaoTexto({ onEnviar, enviando }: BotaoTextoProps) {
 
   if (aberto) {
     return (
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-concreto-300 bg-concreto-50 p-3">
+      <div
+        className="fixed right-0 z-40 border-t border-concreto-300 bg-concreto-50 p-3"
+        style={{ bottom: "var(--nav-inferior, 0px)", left: "var(--nav-lateral, 0px)" }}
+      >
         <textarea
           autoFocus
           value={texto}

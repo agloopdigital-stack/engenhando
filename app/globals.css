@@ -36,3 +36,21 @@ h1, h2, h3, .font-display {
   min-height: 56px;
   min-width: 56px;
 }
+
+/* No celular a barra inferior entra no fluxo. No desktop o espaço é a lateral. */
+.app-casca {
+  --nav-inferior: 0px;
+  --nav-lateral: 0px;
+}
+
+@media (min-width: 768px) {
+  .app-casca {
+    --nav-lateral: 4.5rem;
+    padding-left: var(--nav-lateral);
+    transition: padding-left 200ms ease;
+  }
+
+  .app-casca[data-menu="aberto"] {
+    --nav-lateral: 15rem;
+  }
+}

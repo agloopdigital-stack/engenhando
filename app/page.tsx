@@ -11,10 +11,10 @@ export default function Home() {
         RDO automático: registre a obra com a voz e a câmera, o relatório se organiza sozinho.
       </p>
       <Link
-        href="/obras/df0321c6-2379-455a-beb1-357a8750c5f2/captura"
+        href="/obras"
         className="touch-target mt-4 rounded-2xl bg-sinalizacao px-6 py-3 font-display font-medium"
       >
-        Abrir captação de teste
+        Ver obras
       </Link>
       <p className="text-xs text-concreto-300">
         Login: demo@engenhando.app / Engenhando@2026

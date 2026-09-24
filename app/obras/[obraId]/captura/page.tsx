@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useState } from "react";
-import Link from "next/link";
 import { BotaoGravarAudio } from "@/components/captura/BotaoGravarAudio";
 import { BotaoFoto } from "@/components/captura/BotaoFoto";
 import { BotaoTexto } from "@/components/captura/BotaoTexto";
@@ -42,29 +41,10 @@ export default function CapturaObraPage({
   });
 
   return (
-    <div className="flex h-dvh flex-col bg-concreto-100">
-      <header className="flex items-center justify-between border-b border-concreto-300 bg-projeto-900 px-4 py-4 text-white">
-        <div>
-          <h1 className="font-display text-lg leading-tight">Registro de hoje</h1>
-          <p className="text-sm capitalize text-concreto-300">{hoje}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href={`/obras/${obraId}/dashboard`} className="text-sm text-concreto-300 underline">
-            Painel
-          </Link>
-          <Link href={`/obras/${obraId}/documentos`} className="text-sm text-concreto-300 underline">
-            Documentos
-          </Link>
-          <Link href={`/obras/${obraId}/financeiro`} className="text-sm text-concreto-300 underline">
-            Financeiro
-          </Link>
-          <Link href={`/obras/${obraId}/mao-de-obra`} className="text-sm text-concreto-300 underline">
-            Mão de obra
-          </Link>
-          <Link href="/leads" className="text-sm text-concreto-300 underline">
-            Leads
-          </Link>
-        </div>
+    <div className="flex h-full flex-col bg-concreto-100 md:h-dvh">
+      <header className="border-b border-concreto-300 bg-projeto-900 px-4 py-4 text-white">
+        <h1 className="font-display text-lg leading-tight">Registro de hoje</h1>
+        <p className="text-sm capitalize text-concreto-300">{hoje}</p>
       </header>
 
       {erro && (
@@ -79,20 +59,33 @@ export default function CapturaObraPage({
         <FeedDoDia midias={midias} />
       )}
 
-      {midias.length > 0 && (
-        <div className="fixed bottom-[92px] left-1/2 -translate-x-1/2">
-          <button
-            type="button"
-            onClick={() => setDialogoAberto(true)}
-            className="rounded-full bg-projeto-900 px-4 py-2 text-sm font-display text-white shadow-lg"
-          >
-            Fechar o dia
-          </button>
+      <div className="mt-auto">
+        {midias.length > 0 && (
+          <div className="flex justify-center pb-3">
+            <button
+              type="button"
+              onClick={() => setDialogoAberto(true)}
+              className="rounded-full bg-projeto-900 px-4 py-2 text-sm font-display text-white shadow-lg"
+            >
+              Fechar o dia
+            </button>
+          </div>
+        )}
+        <div className="flex gap-2 border-t border-concreto-300 bg-concreto-50 p-3">
+          <BotaoGravarAudio
+            enviando={enviando}
+            onGravado={(blob) => enviarArquivo(blob, "audio", "audio.webm")}
+          />
+          <BotaoFoto
+            enviando={enviando}
+            onFoto={(arquivo) => enviarArquivo(arquivo, "foto", arquivo.name)}
+          />
+          <BotaoTexto enviando={enviando} onEnviar={enviarTexto} />
         </div>
-      )}
+      </div>
 
       {dialogoAberto && (
-        <div className="fixed inset-0 z-30 flex items-end bg-black/40" role="dialog">
+        <div className="fixed inset-0 z-40 flex items-end bg-black/40" role="dialog">
           <div className="w-full rounded-t-2xl bg-white p-5">
             <h2 className="font-display text-lg">Fechar o dia?</h2>
             <p className="mt-1 text-sm text-tinta-suave">
@@ -120,17 +113,6 @@ export default function CapturaObraPage({
         </div>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 flex gap-2 border-t border-concreto-300 bg-concreto-50 p-3">
-        <BotaoGravarAudio
-          enviando={enviando}
-          onGravado={(blob) => enviarArquivo(blob, "audio", "audio.webm")}
-        />
-        <BotaoFoto
-          enviando={enviando}
-          onFoto={(arquivo) => enviarArquivo(arquivo, "foto", arquivo.name)}
-        />
-        <BotaoTexto enviando={enviando} onEnviar={enviarTexto} />
-      </div>
     </div>
   );
 }

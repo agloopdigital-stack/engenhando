@@ -18,7 +18,7 @@ export default async function DashboardObraPage({
     .order("gerado_em", { ascending: false });
 
   return (
-    <div className="min-h-dvh bg-concreto-100 pb-10">
+    <div className="min-h-full bg-concreto-100 pb-10 md:min-h-dvh">
       <header className="border-b border-concreto-300 bg-projeto-900 px-4 py-5 text-white">
         <p className="text-sm text-concreto-300">Painel da obra</p>
         <h1 className="font-display text-xl">{obra?.nome ?? "Obra"}</h1>

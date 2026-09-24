@@ -37,7 +37,7 @@ function FormularioLogin() {
     // router.push + refresh mantinha a tela de login em "Entrando...".
     const destino =
       searchParams.get("redirect") ??
-      "/obras/df0321c6-2379-455a-beb1-357a8750c5f2/captura";
+      "/obras";
     window.location.assign(destino);
   }
 

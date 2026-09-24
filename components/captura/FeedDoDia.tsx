@@ -17,7 +17,7 @@ export function FeedDoDia({ midias }: FeedDoDiaProps) {
   }
 
   return (
-    <ul className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-40 pt-4">
+    <ul className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 pt-4">
       {midias.map((midia) => (
         <li
           key={midia.id}

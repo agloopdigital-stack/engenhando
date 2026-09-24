@@ -18,7 +18,9 @@ export interface Obra {
   nome: string;
   endereco: string | null;
   cliente_nome: string | null;
+  cliente_contato: string | null;
   status: "ativa" | "pausada" | "concluida";
+  data_inicio: string | null;
 }
 
 export interface RegistroDia {
