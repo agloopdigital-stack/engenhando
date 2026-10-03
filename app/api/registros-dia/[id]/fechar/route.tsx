@@ -4,6 +4,8 @@ import { createServiceClient } from "@/lib/supabase/service";
 import { transcreverAudio } from "@/lib/rdo/transcricao";
 import { organizarResumoDoDia } from "@/lib/rdo/organizar-resumo";
 import { DocumentoRdo } from "@/lib/rdo/documento-pdf";
+import { identidadeDocumento } from "@/lib/documentos/identidade";
+import type { PerfilEmpresa } from "@/lib/types";
 import type { Midia } from "@/lib/types";
 
 // Fecha o dia de uma obra: transcreve os áudios pendentes, organiza tudo
@@ -56,14 +58,21 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
 
   const obra = registroDia.obras as unknown as {
     nome: string;
+    conta_id: string;
     contas: { nome: string; logo_url: string | null; cor_primaria: string | null };
   };
+
+  const { data: perfil } = await supabase
+    .from("perfis_empresa")
+    .select("*")
+    .eq("conta_id", obra.conta_id)
+    .maybeSingle();
 
   const bufferPdf = await renderToBuffer(
     <DocumentoRdo
       obraNome={obra.nome}
       data={registroDia.data}
-      conta={obra.contas}
+      identidade={identidadeDocumento(obra.contas, (perfil as PerfilEmpresa | null) ?? null)}
       resumo={resumo}
       fotos={fotos}
     />

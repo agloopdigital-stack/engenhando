@@ -1,0 +1,14 @@
+---
+description: Depois de alterar o Engenhando, commitar e publicar no main para a Vercel
+alwaysApply: true
+---
+
+# Git e deploy
+
+Depois de concluir uma alteração neste projeto, commitar e enviar para `origin/main`. A Vercel publica sozinha. Não esperar o usuário pedir de novo.
+
+- Trabalhar em `D:\DESENVOLVIMENTO\engenhando-prod`. O repositório `D:\DESENVOLVIMENTO\engenhando` está divergente e não entra nesse push.
+- HEAD fica detached. Não fazer checkout de `main`. Enviar com `git push origin HEAD:main`.
+- Não incluir `.env.local`, segredos nem o churn incidental de `package-lock.json`.
+- Não alterar git config, não usar `git -i`, não fazer `--force` e não pular hooks.
+- No PowerShell, a mensagem vai em here-string. O push por SSH como Vybebrasil é negado: usar `gh auth token --user agloopdigital-stack` na URL HTTPS com `git -c credential.helper=`. Não imprimir o token.

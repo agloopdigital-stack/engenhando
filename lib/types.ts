@@ -31,13 +31,17 @@ export interface PerfilEmpresa {
   cnpj: string | null;
   crea: string | null;
   responsavel_tecnico: string | null;
+  registro_responsavel: string | null;
   cpf_responsavel: string | null;
   telefone: string | null;
   whatsapp: string | null;
   email: string | null;
   site: string | null;
   logo_url: string | null;
+  carimbo_url: string | null;
   endereco: string | null;
+  numero: string | null;
+  complemento: string | null;
   cidade: string | null;
   estado: string | null;
   cep: string | null;

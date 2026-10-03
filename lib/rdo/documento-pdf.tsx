@@ -1,29 +1,20 @@
-import { Document, Page, Text, View, Image, StyleSheet, Font } from "@react-pdf/renderer";
+import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import type { ResumoEstruturado } from "./organizar-resumo";
 import type { Midia } from "@/lib/types";
+import type { IdentidadeDocumento } from "@/lib/documentos/identidade";
+import { AssinaturaDocumento, CabecalhoDocumento, RodapeDocumento } from "@/lib/documentos/blocos-pdf";
 
 interface DadosRdoPdf {
   obraNome: string;
   data: string;
-  conta: { nome: string; logo_url: string | null; cor_primaria: string | null };
+  identidade: IdentidadeDocumento;
   resumo: ResumoEstruturado;
   fotos: Midia[];
 }
 
 function criarEstilos(corPrimaria: string) {
   return StyleSheet.create({
-    page: { padding: 32, fontSize: 11, fontFamily: "Helvetica" },
-    cabecalho: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      borderBottom: `2pt solid ${corPrimaria}`,
-      paddingBottom: 12,
-      marginBottom: 16,
-    },
-    logo: { width: 90, height: 40, objectFit: "contain" },
-    titulo: { fontSize: 18, fontWeight: 700, color: corPrimaria },
-    subtitulo: { fontSize: 11, color: "#4a4a46", marginTop: 2 },
+    page: { padding: 32, paddingBottom: 64, fontSize: 11, fontFamily: "Helvetica" },
     secaoTitulo: {
       fontSize: 13,
       fontWeight: 700,
@@ -37,22 +28,17 @@ function criarEstilos(corPrimaria: string) {
   });
 }
 
-export function DocumentoRdo({ obraNome, data, conta, resumo, fotos }: DadosRdoPdf) {
-  const corPrimaria = conta.cor_primaria ?? "#1B3A5C";
-  const estilos = criarEstilos(corPrimaria);
+export function DocumentoRdo({ obraNome, data, identidade, resumo, fotos }: DadosRdoPdf) {
+  const estilos = criarEstilos(identidade.cor);
 
   return (
     <Document>
       <Page size="A4" style={estilos.page}>
-        <View style={estilos.cabecalho}>
-          <View>
-            <Text style={estilos.titulo}>Relatório Diário de Obra</Text>
-            <Text style={estilos.subtitulo}>
-              {obraNome} — {new Date(data).toLocaleDateString("pt-BR")}
-            </Text>
-          </View>
-          {conta.logo_url && <Image src={conta.logo_url} style={estilos.logo} />}
-        </View>
+        <CabecalhoDocumento
+          identidade={identidade}
+          titulo="Relatório Diário de Obra"
+          subtitulo={`${obraNome} — ${new Date(data).toLocaleDateString("pt-BR")}`}
+        />
 
         {resumo.atividades.length > 0 && (
           <View>
@@ -96,6 +82,8 @@ export function DocumentoRdo({ obraNome, data, conta, resumo, fotos }: DadosRdoP
             </View>
           </View>
         )}
+        <AssinaturaDocumento identidade={identidade} />
+        <RodapeDocumento identidade={identidade} />
       </Page>
     </Document>
   );

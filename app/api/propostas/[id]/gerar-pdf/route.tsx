@@ -3,6 +3,8 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { createServiceClient } from "@/lib/supabase/service";
 import { preencherTemplate } from "@/lib/crm/preencher-template";
 import { DocumentoProposta } from "@/lib/crm/documento-proposta-pdf";
+import { identidadeDocumento, valoresTemplateEmpresa } from "@/lib/documentos/identidade";
+import type { PerfilEmpresa } from "@/lib/types";
 
 export async function POST(_req: Request, context: { params: Promise<{ id: string }> }) {
   const { id: propostaId } = await context.params;
@@ -25,13 +27,20 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
     contas: { nome: string; logo_url: string | null; cor_primaria: string | null };
   };
 
-  const corpoPreenchido = preencherTemplate(
-    template?.corpo_template ?? "",
-    proposta.valores_preenchidos as Record<string, string>
-  );
+  const { data: perfil } = await supabase
+    .from("perfis_empresa")
+    .select("*")
+    .eq("conta_id", lead.conta_id)
+    .maybeSingle();
+
+  const identidade = identidadeDocumento(lead.contas, (perfil as PerfilEmpresa | null) ?? null);
+  const corpoPreenchido = preencherTemplate(template?.corpo_template ?? "", {
+    ...((proposta.valores_preenchidos as Record<string, string> | null) ?? {}),
+    ...valoresTemplateEmpresa(identidade),
+  });
 
   const bufferPdf = await renderToBuffer(
-    <DocumentoProposta clienteNome={lead.nome} corpo={corpoPreenchido} conta={lead.contas} />
+    <DocumentoProposta clienteNome={lead.nome} corpo={corpoPreenchido} identidade={identidade} />
   );
 
   const caminhoPdf = `propostas/${lead.conta_id}/${propostaId}.pdf`;
