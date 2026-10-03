@@ -262,7 +262,7 @@ export default function EmpresaPage() {
           <label className="text-sm text-tinta-suave">
             UF
             <select
-              value={form.estado}
+              value={form.estado ?? ""}
               onChange={(e) => atualizar("estado", e.target.value)}
               className="touch-target mt-1 w-full rounded-xl border border-concreto-300 bg-white px-4 outline-none focus:border-projeto-500"
             >
@@ -308,7 +308,7 @@ export default function EmpresaPage() {
           <label className="text-sm text-tinta-suave">
             Observações comerciais
             <textarea
-              value={form.observacoes_comerciais}
+              value={form.observacoes_comerciais ?? ""}
               onChange={(e) => atualizar("observacoes_comerciais", e.target.value)}
               rows={3}
               className="mt-1 w-full rounded-xl border border-concreto-300 bg-white p-3 outline-none focus:border-projeto-500"
