@@ -71,6 +71,13 @@ function atalhos(obraId: string | null): Atalho[] {
       href: "/leads",
       ativo: (caminho) => caminho.startsWith("/leads"),
     },
+    {
+      id: "empresa",
+      rotulo: "Empresa",
+      curto: "Empresa",
+      href: "/empresa",
+      ativo: (caminho) => caminho.startsWith("/empresa"),
+    },
   ];
 }
 
@@ -98,6 +105,7 @@ export function CascaApp({ children }: { children: React.ReactNode }) {
   if (ocultar) return children;
 
   const itens = atalhos(obraId);
+  const itensMobile = itens.filter((item) => item.id !== "painel");
 
   function alternarMenu() {
     setAberta((atual) => {
@@ -164,7 +172,7 @@ export function CascaApp({ children }: { children: React.ReactNode }) {
         aria-label="Atalhos"
       >
         <ul className="flex h-[4.25rem]">
-          {itens.map((item) => (
+          {itensMobile.map((item) => (
             <li key={item.id} className="min-w-0 flex-1">
               <Link
                 href={item.href}
@@ -240,6 +248,13 @@ function Icone({ nome }: { nome: string }) {
           <circle cx="9" cy="8" r="3" />
           <circle cx="17" cy="9" r="2" />
           <path d="M3 19c.5-3 2.8-4.5 6-4.5s5.5 1.5 6 4.5M15 14.5c1.8 0 3.4.8 4 2.5" strokeLinecap="round" />
+        </svg>
+      );
+    case "empresa":
+      return (
+        <svg {...comum}>
+          <rect x="4" y="3" width="16" height="18" rx="2" />
+          <path d="M8 7h8M8 11h8M8 15h5" strokeLinecap="round" />
         </svg>
       );
     case "leads":

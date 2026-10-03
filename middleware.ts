@@ -32,7 +32,8 @@ export async function middleware(request: NextRequest) {
   const rotaProtegida =
     request.nextUrl.pathname.startsWith("/obras") ||
     request.nextUrl.pathname.startsWith("/leads") ||
-    request.nextUrl.pathname.startsWith("/documentos");
+    request.nextUrl.pathname.startsWith("/documentos") ||
+    request.nextUrl.pathname.startsWith("/empresa");
 
   if (rotaProtegida && !user) {
     const url = request.nextUrl.clone();
@@ -45,5 +46,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/obras/:path*", "/leads/:path*", "/documentos/:path*"],
+  matcher: ["/obras/:path*", "/leads/:path*", "/documentos/:path*", "/empresa", "/empresa/:path*"],
 };

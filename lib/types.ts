@@ -23,6 +23,33 @@ export interface Obra {
   data_inicio: string | null;
 }
 
+export interface PerfilEmpresa {
+  id: string;
+  conta_id: string;
+  razao_social: string | null;
+  nome_fantasia: string | null;
+  cnpj: string | null;
+  crea: string | null;
+  responsavel_tecnico: string | null;
+  cpf_responsavel: string | null;
+  telefone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  site: string | null;
+  logo_url: string | null;
+  endereco: string | null;
+  cidade: string | null;
+  estado: string | null;
+  cep: string | null;
+  inscricao_municipal: string | null;
+  pix_chave: string | null;
+  banco: string | null;
+  agencia: string | null;
+  conta_bancaria: string | null;
+  observacoes_comerciais: string | null;
+  assinatura_padrao: string | null;
+}
+
 export interface RegistroDia {
   id: string;
   obra_id: string;
