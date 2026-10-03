@@ -2,17 +2,20 @@
 
 import { useEffect, useId, useRef } from "react";
 import Link from "next/link";
-import { ESTAGIOS, type LeadLista } from "@/lib/crm/funil";
+import type { LeadLista } from "@/lib/crm/funil";
+import type { ColunaQuadro } from "@/lib/crm/quadro";
 import type { EstagioLead } from "@/lib/types";
 
 export function FolhaEstagio({
   lead,
+  colunas,
   abrindoObra,
   onEscolher,
   onAbrirObra,
   onFechar,
 }: {
   lead: LeadLista;
+  colunas: ColunaQuadro[];
   abrindoObra: boolean;
   onEscolher: (estagio: EstagioLead) => void;
   onAbrirObra: () => void;
@@ -47,19 +50,19 @@ export function FolhaEstagio({
         <p className="mt-1 text-sm text-tinta-suave">Mover para</p>
 
         <div className="mt-3 grid grid-cols-2 gap-2">
-          {ESTAGIOS.map((estagio) => (
+          {colunas.map((coluna) => (
             <button
-              key={estagio.chave}
+              key={coluna.estagio}
               type="button"
-              aria-pressed={lead.estagio === estagio.chave}
-              onClick={() => onEscolher(estagio.chave)}
+              aria-pressed={lead.estagio === coluna.estagio}
+              onClick={() => onEscolher(coluna.estagio)}
               className={`touch-target rounded-xl border px-3 font-display text-sm ${
-                lead.estagio === estagio.chave
+                lead.estagio === coluna.estagio
                   ? "border-projeto-900 bg-projeto-900 text-white"
                   : "border-concreto-300 bg-white text-tinta"
               }`}
             >
-              {estagio.rotulo}
+              {coluna.rotulo}
             </button>
           ))}
         </div>

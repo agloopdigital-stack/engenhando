@@ -9,7 +9,6 @@ import { mascararTelefone } from "@/lib/empresa";
 import { extrairCamposTemplate } from "@/lib/crm/preencher-template";
 import {
   CAMPOS_PROPOSTA_RESERVADOS,
-  ESTAGIOS,
   abrirObraDoLead,
   atualizarEstagio,
   diasDesde,
@@ -19,12 +18,14 @@ import {
   parseValor,
   separarContato,
 } from "@/lib/crm/funil";
+import { QUADRO_PADRAO, buscarQuadro, rotuloColuna, type ColunaQuadro } from "@/lib/crm/quadro";
 import type { ContatoLead, EstagioLead, Lead, Proposta, TemplateProposta, TipoServico } from "@/lib/types";
 
 export function DetalheLead({ leadId }: { leadId: string }) {
   const router = useRouter();
   const supabase = createClient();
   const [lead, setLead] = useState<Lead | null>(null);
+  const [colunas, setColunas] = useState<ColunaQuadro[]>(QUADRO_PADRAO.colunas);
   const [tipos, setTipos] = useState<TipoServico[]>([]);
   const [templates, setTemplates] = useState<TemplateProposta[]>([]);
   const [propostas, setPropostas] = useState<Proposta[]>([]);
@@ -70,14 +71,15 @@ export function DetalheLead({ leadId }: { leadId: string }) {
         setEmail(encontrado.email || legado.email);
         setEndereco(encontrado.endereco ?? "");
         setTipoServicoId(encontrado.tipo_servico_id ?? "");
-        const { data: templatesData } = await supabase
-          .from("templates_proposta")
-          .select("*")
-          .eq("conta_id", encontrado.conta_id);
+        const [{ data: templatesData }, quadro] = await Promise.all([
+          supabase.from("templates_proposta").select("*").eq("conta_id", encontrado.conta_id),
+          buscarQuadro(supabase, encontrado.conta_id),
+        ]);
         if (!ativo) return;
         const lista = (templatesData as TemplateProposta[] | null) ?? [];
         setTemplates(lista);
         setTemplateId(lista[0]?.id ?? "");
+        setColunas(quadro.colunas);
       }
 
       setCarregando(false);
@@ -328,25 +330,25 @@ export function DetalheLead({ leadId }: { leadId: string }) {
             Leads
           </Link>
           <h1 className="mt-2 font-display text-xl">{nome || lead.nome}</h1>
-          <p className="mt-1 text-sm text-tinta-suave">{ESTAGIOS.find((item) => item.chave === lead.estagio)?.rotulo}</p>
+          <p className="mt-1 text-sm text-tinta-suave">{rotuloColuna(colunas, lead.estagio)}</p>
         </div>
 
         <section className="rounded-xl border border-concreto-300 bg-white p-4">
           <h2 className="font-display text-base">Estágio</h2>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {ESTAGIOS.map((estagio) => (
+            {colunas.map((coluna) => (
               <button
-                key={estagio.chave}
+                key={coluna.estagio}
                 type="button"
-                aria-pressed={lead.estagio === estagio.chave}
-                onClick={() => mudarEstagio(estagio.chave)}
+                aria-pressed={lead.estagio === coluna.estagio}
+                onClick={() => mudarEstagio(coluna.estagio)}
                 className={`touch-target rounded-xl border px-3 font-display text-sm ${
-                  lead.estagio === estagio.chave
+                  lead.estagio === coluna.estagio
                     ? "border-projeto-900 bg-projeto-900 text-white"
                     : "border-concreto-300 bg-white text-tinta"
                 }`}
               >
-                {estagio.rotulo}
+                {coluna.rotulo}
               </button>
             ))}
           </div>

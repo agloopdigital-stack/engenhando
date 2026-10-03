@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState, type Dispatch, type SetStateAction } fr
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  ESTAGIOS,
   abrirObraDoLead,
   atualizarEstagio,
   formatarMoeda,
@@ -13,6 +12,7 @@ import {
   temPropostaEnviada,
   type LeadLista,
 } from "@/lib/crm/funil";
+import type { QuadroLead } from "@/lib/crm/quadro";
 import type { EstagioLead } from "@/lib/types";
 import { ResumoLead } from "./ListaLeads";
 import { FolhaEstagio } from "./FolhaEstagio";
@@ -24,9 +24,11 @@ type Aviso = { texto: string; leadObra?: string };
 export function QuadroLeads({
   leads,
   setLeads,
+  quadro,
 }: {
   leads: LeadLista[];
   setLeads: Dispatch<SetStateAction<LeadLista[]>>;
+  quadro: QuadroLead;
 }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -39,6 +41,9 @@ export function QuadroLeads({
   const [abrindoObra, setAbrindoObra] = useState(false);
 
   const ordenados = useMemo(() => ordenarLeads(leads), [leads]);
+  const foraDoQuadro = ordenados.filter(
+    (lead) => quadro.colunas.find((coluna) => coluna.estagio === lead.estagio)?.visivel === false
+  ).length;
   const leadSelecionado = leads.find((lead) => lead.id === selecionado) ?? null;
   const fecharFolha = useCallback(() => setSelecionado(null), []);
 
@@ -128,13 +133,22 @@ export function QuadroLeads({
       )}
 
       <p className="text-sm text-tinta-suave md:hidden">Deslize para ver os outros estágios. Toque no lead para mudar.</p>
+      {foraDoQuadro > 0 && (
+        <p className="text-sm text-tinta-suave">
+          {foraDoQuadro === 1
+            ? "1 lead está numa coluna escondida. Ele continua na lista."
+            : `${foraDoQuadro} leads estão em colunas escondidas. Eles continuam na lista.`}
+        </p>
+      )}
 
       <div className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 md:snap-none">
-        {ESTAGIOS.map(({ chave, rotulo }) => {
+        {quadro.colunas.filter((coluna) => coluna.visivel).map(({ estagio: chave, rotulo }) => {
           const doEstagio = ordenados.filter((lead) => lead.estagio === chave);
           const soma = somaValor(doEstagio);
           const recolhivel = RECOLHIVEIS.includes(chave);
           const recolhida = recolhivel && !abertas.includes(chave);
+          const mostrarContagem = quadro.cabecalho !== "soma";
+          const mostrarSoma = quadro.cabecalho === "soma" || (quadro.cabecalho === "ambos" && soma > 0);
 
           return (
             <section
@@ -165,9 +179,10 @@ export function QuadroLeads({
               <header className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <h2 className="font-display text-sm">
-                    {rotulo} · {doEstagio.length}
+                    {rotulo}
+                    {mostrarContagem && ` · ${doEstagio.length}`}
                   </h2>
-                  {soma > 0 && <p className="mt-1 text-sm text-tinta-suave">{formatarMoeda(soma)}</p>}
+                  {mostrarSoma && <p className="mt-1 text-sm text-tinta-suave">{formatarMoeda(soma)}</p>}
                 </div>
                 {recolhivel && doEstagio.length > 0 && (
                   <button
@@ -225,6 +240,7 @@ export function QuadroLeads({
       {leadSelecionado && (
         <FolhaEstagio
           lead={leadSelecionado}
+          colunas={quadro.colunas}
           abrindoObra={abrindoObra}
           onEscolher={(estagio) => {
             fecharFolha();

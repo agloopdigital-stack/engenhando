@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getContaDoUsuarioLogado } from "@/lib/conta-atual";
 import { paraLeadLista } from "@/lib/crm/funil";
+import { QUADRO_PADRAO, normalizarQuadro } from "@/lib/crm/quadro";
 import { PainelLeads } from "@/components/leads/PainelLeads";
 import type { EstagioLead } from "@/lib/types";
 
@@ -44,9 +45,14 @@ export default async function LeadsPage() {
 
   const leads = ((data ?? []) as unknown as LinhaLead[]).map(paraLeadLista);
 
+  const { data: quadroData } = contaId
+    ? await supabase.from("quadros_lead").select("cabecalho, colunas").eq("conta_id", contaId).maybeSingle()
+    : { data: null };
+  const quadro = quadroData ? normalizarQuadro(quadroData) : QUADRO_PADRAO;
+
   return (
     <main className="flex min-h-full flex-col bg-concreto-100 px-4 pt-6 md:min-h-dvh">
-      <PainelLeads leadsIniciais={leads} />
+      <PainelLeads leadsIniciais={leads} quadroInicial={quadro} contaId={contaId} />
 
       <div className="sticky bottom-0 z-10 -mx-4 mt-auto border-t border-concreto-300 bg-concreto-100 px-4 py-3">
         <div className="mx-auto max-w-3xl">

@@ -4,19 +4,18 @@ import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {
   DIAS_FOLLOWUP,
-  ESTAGIOS,
   diasDesde,
   formatarMoeda,
   ordenarLeads,
   pedeRetorno,
-  rotuloEstagio,
   type LeadLista,
 } from "@/lib/crm/funil";
+import { rotuloColuna, type QuadroLead } from "@/lib/crm/quadro";
 import type { EstagioLead } from "@/lib/types";
 
 type Filtro = EstagioLead | "todos" | "atencao";
 
-export function ListaLeads({ leads }: { leads: LeadLista[] }) {
+export function ListaLeads({ leads, quadro }: { leads: LeadLista[]; quadro: QuadroLead }) {
   const [filtro, setFiltro] = useState<Filtro>("todos");
   const ordenados = useMemo(() => ordenarLeads(leads), [leads]);
   const atencao = ordenados.filter(pedeRetorno).length;
@@ -44,15 +43,15 @@ export function ListaLeads({ leads }: { leads: LeadLista[] }) {
         <Chip ativo={filtro === "todos"} onClick={() => setFiltro("todos")}>
           Todos · {ordenados.length}
         </Chip>
-        {ESTAGIOS.map((estagio) => {
-          const quantidade = ordenados.filter((lead) => lead.estagio === estagio.chave).length;
+        {quadro.colunas.map((coluna) => {
+          const quantidade = ordenados.filter((lead) => lead.estagio === coluna.estagio).length;
           return (
             <Chip
-              key={estagio.chave}
-              ativo={filtro === estagio.chave}
-              onClick={() => setFiltro(estagio.chave)}
+              key={coluna.estagio}
+              ativo={filtro === coluna.estagio}
+              onClick={() => setFiltro(coluna.estagio)}
             >
-              {estagio.rotulo} · {quantidade}
+              {coluna.rotulo} · {quantidade}
             </Chip>
           );
         })}
@@ -68,7 +67,7 @@ export function ListaLeads({ leads }: { leads: LeadLista[] }) {
         <ul className="flex flex-col gap-2">
           {visiveis.map((lead) => (
             <li key={lead.id}>
-              <CardLead lead={lead} />
+              <CardLead lead={lead} quadro={quadro} />
             </li>
           ))}
         </ul>
@@ -100,15 +99,23 @@ function Chip({
   );
 }
 
-function CardLead({ lead }: { lead: LeadLista }) {
+function CardLead({ lead, quadro }: { lead: LeadLista; quadro: QuadroLead }) {
   return (
     <Link href={`/leads/${lead.id}`} className="block rounded-2xl border border-concreto-300 bg-white p-4">
-      <ResumoLead lead={lead} mostrarEstagio />
+      <ResumoLead lead={lead} mostrarEstagio rotulo={rotuloColuna(quadro, lead.estagio)} />
     </Link>
   );
 }
 
-export function ResumoLead({ lead, mostrarEstagio = false }: { lead: LeadLista; mostrarEstagio?: boolean }) {
+export function ResumoLead({
+  lead,
+  mostrarEstagio = false,
+  rotulo,
+}: {
+  lead: LeadLista;
+  mostrarEstagio?: boolean;
+  rotulo?: string;
+}) {
   const dias = diasDesde(lead.proposta?.enviada_em);
   const atrasada =
     pedeRetorno(lead) && dias !== null && dias >= DIAS_FOLLOWUP && lead.proposta?.status === "enviada";
@@ -122,7 +129,7 @@ export function ResumoLead({ lead, mostrarEstagio = false }: { lead: LeadLista; 
           {lead.tipoServico && <p className="mt-1 text-sm text-tinta-suave">{lead.tipoServico}</p>}
           {contato && <p className="mt-1 text-sm text-tinta-suave">{contato}</p>}
         </div>
-        {mostrarEstagio && <span className="shrink-0 text-sm text-projeto-700">{rotuloEstagio(lead.estagio)}</span>}
+        {mostrarEstagio && <span className="shrink-0 text-sm text-projeto-700">{rotulo}</span>}
       </div>
       {(lead.proposta?.valor != null || dias !== null) && (
         <p className={`mt-2 text-sm ${atrasada ? "font-medium text-alerta" : "text-tinta-suave"}`}>
