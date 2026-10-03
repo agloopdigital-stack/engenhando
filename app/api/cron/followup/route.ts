@@ -14,7 +14,7 @@ export async function GET(req: Request) {
 
   const { data: automacoes } = await supabase
     .from("automacoes_followup")
-    .select("*, propostas(enviada_em, lead_id, leads(nome, contato, conta_id, contas(nome)))")
+    .select("*, propostas(enviada_em, lead_id, leads(nome, contato, email, conta_id, contas(nome)))")
     .eq("executada", false);
 
   let processadas = 0;
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const proposta = automacao.propostas as unknown as {
       enviada_em: string | null;
       lead_id: string;
-      leads: { nome: string; contato: string | null; conta_id: string; contas: { nome: string } };
+      leads: { nome: string; contato: string | null; email: string | null; conta_id: string; contas: { nome: string } };
     };
 
     if (!proposta?.enviada_em) continue;
@@ -32,14 +32,17 @@ export async function GET(req: Request) {
       (Date.now() - new Date(proposta.enviada_em).getTime()) / (1000 * 60 * 60 * 24);
     if (diasPassados < automacao.dias_apos_envio) continue;
 
-    const contatoLead = proposta.leads.contato;
-    if (contatoLead?.includes("@")) {
-      await enviarEmail(
-        contatoLead,
-        `Follow-up: proposta de ${proposta.leads.contas.nome}`,
-        `Olá ${proposta.leads.nome}, gostaríamos de saber se você teve a chance de avaliar nossa proposta. Ficamos à disposição para qualquer dúvida.`
-      );
-    }
+    const contatoLead = proposta.leads.email?.includes("@")
+      ? proposta.leads.email
+      : proposta.leads.contato;
+    const temEmail = Boolean(contatoLead?.includes("@"));
+    const enviou = temEmail
+      ? await enviarEmail(
+          contatoLead as string,
+          `Follow-up: proposta de ${proposta.leads.contas.nome}`,
+          `Olá ${proposta.leads.nome}, gostaríamos de saber se você teve a chance de avaliar nossa proposta. Ficamos à disposição para qualquer dúvida.`
+        )
+      : false;
 
     await supabase
       .from("leads")
@@ -47,12 +50,13 @@ export async function GET(req: Request) {
       .eq("id", proposta.lead_id)
       .eq("estagio", "proposta_enviada");
 
-    await supabase
-      .from("automacoes_followup")
-      .update({ executada: true, executada_em: new Date().toISOString() })
-      .eq("id", automacao.id);
-
-    processadas++;
+    if (enviou || !temEmail) {
+      await supabase
+        .from("automacoes_followup")
+        .update({ executada: true, executada_em: new Date().toISOString() })
+        .eq("id", automacao.id);
+      processadas++;
+    }
   }
 
   return NextResponse.json({ processadas });

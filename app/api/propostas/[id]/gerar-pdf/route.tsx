@@ -44,23 +44,17 @@ export async function POST(_req: Request, context: { params: Promise<{ id: strin
   );
 
   const caminhoPdf = `propostas/${lead.conta_id}/${propostaId}.pdf`;
-  await supabase.storage
+  const { error: erroUpload } = await supabase.storage
     .from("midias")
     .upload(caminhoPdf, bufferPdf, { contentType: "application/pdf", upsert: true });
+
+  if (erroUpload) {
+    return NextResponse.json({ erro: "Não consegui guardar o PDF." }, { status: 500 });
+  }
+
   const { data: urlPublica } = supabase.storage.from("midias").getPublicUrl(caminhoPdf);
 
-  await supabase
-    .from("propostas")
-    .update({ pdf_url: urlPublica.publicUrl, status: "enviada", enviada_em: new Date().toISOString() })
-    .eq("id", propostaId);
-
-  await supabase.from("leads").update({ estagio: "proposta_enviada" }).eq("id", lead ? proposta.lead_id : "");
-
-  await supabase.from("automacoes_followup").insert({
-    conta_id: lead.conta_id,
-    proposta_id: propostaId,
-    dias_apos_envio: 3,
-  });
+  await supabase.from("propostas").update({ pdf_url: urlPublica.publicUrl }).eq("id", propostaId);
 
   return NextResponse.json({ pdf_url: urlPublica.publicUrl });
 }

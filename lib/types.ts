@@ -73,9 +73,20 @@ export interface Lead {
   conta_id: string;
   nome: string;
   contato: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  endereco: string | null;
   tipo_servico_id: string | null;
   estagio: EstagioLead;
   obra_relacionada: string | null;
+  criado_em: string;
+}
+
+export interface ContatoLead {
+  id: string;
+  lead_id: string;
+  conta_id: string;
+  nota: string;
   criado_em: string;
 }
 
@@ -92,6 +103,9 @@ export interface Proposta {
   lead_id: string;
   template_id: string | null;
   valores_preenchidos: Record<string, string>;
+  valor: number | null;
+  prazo_dias: number | null;
+  escopo: string | null;
   pdf_url: string | null;
   status: "rascunho" | "enviada" | "aceita" | "recusada";
   enviada_em: string | null;
