@@ -9,6 +9,7 @@ import {
   formatarMoeda,
   ordenarLeads,
   pedeRetorno,
+  rotuloEstagio,
   type LeadLista,
 } from "@/lib/crm/funil";
 import type { EstagioLead } from "@/lib/types";
@@ -100,20 +101,28 @@ function Chip({
 }
 
 function CardLead({ lead }: { lead: LeadLista }) {
+  return (
+    <Link href={`/leads/${lead.id}`} className="block rounded-2xl border border-concreto-300 bg-white p-4">
+      <ResumoLead lead={lead} mostrarEstagio />
+    </Link>
+  );
+}
+
+export function ResumoLead({ lead, mostrarEstagio = false }: { lead: LeadLista; mostrarEstagio?: boolean }) {
   const dias = diasDesde(lead.proposta?.enviada_em);
   const atrasada =
     pedeRetorno(lead) && dias !== null && dias >= DIAS_FOLLOWUP && lead.proposta?.status === "enviada";
   const contato = lead.whatsapp || lead.email;
 
   return (
-    <Link href={`/leads/${lead.id}`} className="block rounded-2xl border border-concreto-300 bg-white p-4">
+    <>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-display text-base leading-tight">{lead.nome}</p>
           {lead.tipoServico && <p className="mt-1 text-sm text-tinta-suave">{lead.tipoServico}</p>}
           {contato && <p className="mt-1 text-sm text-tinta-suave">{contato}</p>}
         </div>
-        <span className="shrink-0 text-sm text-projeto-700">{rotuloCurto(lead.estagio)}</span>
+        {mostrarEstagio && <span className="shrink-0 text-sm text-projeto-700">{rotuloEstagio(lead.estagio)}</span>}
       </div>
       {(lead.proposta?.valor != null || dias !== null) && (
         <p className={`mt-2 text-sm ${atrasada ? "font-medium text-alerta" : "text-tinta-suave"}`}>
@@ -122,10 +131,6 @@ function CardLead({ lead }: { lead: LeadLista }) {
           {dias !== null && `Proposta há ${dias} ${dias === 1 ? "dia" : "dias"}`}
         </p>
       )}
-    </Link>
+    </>
   );
-}
-
-function rotuloCurto(estagio: LeadLista["estagio"]) {
-  return ESTAGIOS.find((item) => item.chave === estagio)?.rotulo ?? estagio;
 }

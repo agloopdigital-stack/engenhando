@@ -2,15 +2,18 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getContaDoUsuarioLogado } from "@/lib/conta-atual";
 import { paraLeadLista } from "@/lib/crm/funil";
-import { ListaLeads } from "@/components/leads/ListaLeads";
+import { PainelLeads } from "@/components/leads/PainelLeads";
 import type { EstagioLead } from "@/lib/types";
 
 type LinhaLead = {
   id: string;
+  conta_id: string;
   nome: string;
   contato: string | null;
   whatsapp: string | null;
   email: string | null;
+  endereco: string | null;
+  obra_relacionada: string | null;
   estagio: EstagioLead;
   criado_em: string;
   tipos_servico: { nome: string } | null;
@@ -34,7 +37,7 @@ export default async function LeadsPage() {
     ? await supabase
         .from("leads")
         .select(
-          "id, nome, contato, whatsapp, email, estagio, criado_em, tipos_servico(nome), propostas(id, status, enviada_em, valor, prazo_dias, pdf_url, escopo, criado_em)"
+          "id, conta_id, nome, contato, whatsapp, email, endereco, obra_relacionada, estagio, criado_em, tipos_servico(nome), propostas(id, status, enviada_em, valor, prazo_dias, pdf_url, escopo, criado_em)"
         )
         .eq("conta_id", contaId)
     : { data: [] as LinhaLead[] };
@@ -42,16 +45,10 @@ export default async function LeadsPage() {
   const leads = ((data ?? []) as unknown as LinhaLead[]).map(paraLeadLista);
 
   return (
-    <main className="min-h-full bg-concreto-100 px-4 py-6 md:min-h-dvh">
-      <div className="mx-auto flex max-w-3xl flex-col gap-4 pb-28">
-        <div>
-          <h1 className="font-display text-xl">Leads</h1>
-          <p className="mt-1 text-sm text-tinta-suave">Quem pediu orçamento e quem está esperando retorno.</p>
-        </div>
-        <ListaLeads leads={leads} />
-      </div>
+    <main className="flex min-h-full flex-col bg-concreto-100 px-4 pt-6 md:min-h-dvh">
+      <PainelLeads leadsIniciais={leads} />
 
-      <div className="sticky bottom-0 z-10 -mx-4 mt-4 border-t border-concreto-300 bg-concreto-100 px-4 py-3">
+      <div className="sticky bottom-0 z-10 -mx-4 mt-auto border-t border-concreto-300 bg-concreto-100 px-4 py-3">
         <div className="mx-auto max-w-3xl">
           <Link
             href="/leads/novo"

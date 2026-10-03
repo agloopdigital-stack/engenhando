@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EstagioLead } from "@/lib/types";
 import { apenasDigitos } from "@/lib/empresa";
 
@@ -36,9 +37,12 @@ export type PropostaResumo = {
 
 export type LeadLista = {
   id: string;
+  contaId: string;
   nome: string;
   whatsapp: string;
   email: string;
+  endereco: string;
+  obraRelacionada: string | null;
   estagio: EstagioLead;
   tipoServico: string;
   criadoEm: string;
@@ -124,10 +128,13 @@ function propostaEmDestaque(propostas: PropostaBruta[]): PropostaResumo | null {
 
 export function paraLeadLista(row: {
   id: string;
+  conta_id: string;
   nome: string;
   contato: string | null;
   whatsapp: string | null;
   email: string | null;
+  endereco: string | null;
+  obra_relacionada: string | null;
   estagio: EstagioLead;
   criado_em: string;
   tipos_servico: TipoJoin;
@@ -136,9 +143,12 @@ export function paraLeadLista(row: {
   const legado = separarContato(row.contato);
   return {
     id: row.id,
+    contaId: row.conta_id,
     nome: row.nome,
     whatsapp: (row.whatsapp ?? "").trim() || legado.whatsapp,
     email: (row.email ?? "").trim() || legado.email,
+    endereco: (row.endereco ?? "").trim(),
+    obraRelacionada: row.obra_relacionada,
     estagio: row.estagio,
     tipoServico: nomeTipo(row.tipos_servico),
     criadoEm: row.criado_em,
@@ -164,4 +174,41 @@ export function ordenarLeads(leads: LeadLista[]) {
 
 export function rotuloEstagio(estagio: EstagioLead) {
   return ESTAGIOS.find((item) => item.chave === estagio)?.rotulo ?? estagio;
+}
+
+export function somaValor(leads: LeadLista[]) {
+  return leads.reduce((total, lead) => total + (lead.proposta?.valor ?? 0), 0);
+}
+
+export function temPropostaEnviada(lead: LeadLista) {
+  return lead.proposta?.status === "enviada" || lead.proposta?.status === "aceita";
+}
+
+export async function atualizarEstagio(supabase: SupabaseClient, leadId: string, estagio: EstagioLead) {
+  const { error } = await supabase.from("leads").update({ estagio }).eq("id", leadId);
+  return !error;
+}
+
+export async function abrirObraDoLead(
+  supabase: SupabaseClient,
+  lead: { id: string; contaId: string; nome: string; endereco: string; contato: string }
+): Promise<{ obraId: string } | { erro: string }> {
+  const { data: obra, error } = await supabase
+    .from("obras")
+    .insert({
+      conta_id: lead.contaId,
+      nome: lead.nome,
+      endereco: lead.endereco || null,
+      cliente_nome: lead.nome,
+      cliente_contato: lead.contato || null,
+    })
+    .select("id")
+    .single();
+
+  if (error || !obra) return { erro: "Não consegui abrir a obra." };
+
+  const { error: erroLead } = await supabase.from("leads").update({ obra_relacionada: obra.id }).eq("id", lead.id);
+  if (erroLead) return { erro: "A obra foi criada, mas não consegui ligar ao lead." };
+
+  return { obraId: obra.id as string };
 }

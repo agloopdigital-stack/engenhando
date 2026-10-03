@@ -10,6 +10,8 @@ import { extrairCamposTemplate } from "@/lib/crm/preencher-template";
 import {
   CAMPOS_PROPOSTA_RESERVADOS,
   ESTAGIOS,
+  abrirObraDoLead,
+  atualizarEstagio,
   diasDesde,
   formatarMoeda,
   linkTelefone,
@@ -141,8 +143,8 @@ export function DetalheLead({ leadId }: { leadId: string }) {
     setAviso(null);
     const anterior = lead.estagio;
     setLead({ ...lead, estagio });
-    const { error } = await supabase.from("leads").update({ estagio }).eq("id", lead.id);
-    if (error) {
+    const ok = await atualizarEstagio(supabase, lead.id, estagio);
+    if (!ok) {
       setLead({ ...lead, estagio: anterior });
       setErro("Não consegui mudar o estágio.");
     }
@@ -266,32 +268,21 @@ export function DetalheLead({ leadId }: { leadId: string }) {
       return;
     }
 
-    const { data: obra, error } = await supabase
-      .from("obras")
-      .insert({
-        conta_id: lead.conta_id,
-        nome: nome.trim(),
-        endereco: endereco.trim() || null,
-        cliente_nome: nome.trim(),
-        cliente_contato: whatsapp.trim() || email.trim() || null,
-      })
-      .select("id")
-      .single();
+    const resultado = await abrirObraDoLead(supabase, {
+      id: lead.id,
+      contaId: lead.conta_id,
+      nome: nome.trim(),
+      endereco: endereco.trim(),
+      contato: whatsapp.trim() || email.trim(),
+    });
 
-    if (error || !obra) {
-      setErro("Não consegui abrir a obra.");
+    if ("erro" in resultado) {
+      setErro(resultado.erro);
       setOcupado(false);
       return;
     }
 
-    const { error: erroLead } = await supabase.from("leads").update({ obra_relacionada: obra.id }).eq("id", lead.id);
-    if (erroLead) {
-      setErro("A obra foi criada, mas não consegui ligar ao lead.");
-      setOcupado(false);
-      return;
-    }
-
-    router.push(`/obras/${obra.id}`);
+    router.push(`/obras/${resultado.obraId}`);
   }
 
   async function acaoPrincipal() {
